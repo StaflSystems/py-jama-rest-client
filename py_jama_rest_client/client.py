@@ -1,7 +1,10 @@
 import json
 import logging
+from tkinter.tix import MAX
 
 from .core import Core, CoreException
+
+MAX_PAGE_SIZE = 50
 
 # This is the py_jama_rest_client logger.
 py_jama_rest_client_logger = logging.getLogger('py_jama_rest_client')
@@ -1094,6 +1097,65 @@ class JamaClient:
         params = {}
         testcases = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
         return testcases
+    
+    def put_testcase_testgroup(self, testplan_id, testgroup_id, testcase_id):
+        """
+        This method will add a Test Case to a Test Group.
+
+        Args:
+            testplan_id (int): The API_ID of the test plan containing the test group.
+            testgroup_id (int): The API_ID of the test group to add the test case to.
+            testcase_id (int): The API_ID of the test case to add.
+
+        Returns:
+            None
+        """
+
+        resource_path = f'testplans/{testplan_id}/testgroups/{testgroup_id}/testcases'
+        body = {
+            'testcase': testcase_id
+        }
+        headers = {'content-type': 'application/json'}
+
+        try:
+            response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+        
+        JamaClient.__handle_response_status(response)
+
+    def post_testplan(self, project_id, name, contents):
+        """
+        This method will create a new test plan
+
+        Args:
+            project_id (int): The API_ID of the parent project.
+            name (str): The name of the new test plan.
+            contents (str): The contents of the new test plan.
+        """
+        resource_path = 'testplans/'
+        headers = {'content-type': 'application/json'}
+
+        body = {
+            'project': project_id,
+            'fields': {
+                'name': name,
+                'contents': contents,
+            },
+        }
+
+        # Make the API Call
+        try:
+            response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+
+        # Validate response
+        JamaClient.__handle_response_status(response)
+        return response.json()['meta']['id']
+
 
     def post_testplans_testcycles(self, testplan_id, testcycle_name, start_date, end_date, testgroups_to_include=None,
                                   testrun_status_to_include=None):
@@ -1443,7 +1505,7 @@ class JamaClient:
         parameter is required for the resource, include it in the params parameter.
         Returns a single JSON array with all of the retrieved items."""
 
-        if allowed_results_per_page < 1 or allowed_results_per_page > 50:
+        if allowed_results_per_page < 1 or allowed_results_per_page > MAX_PAGE_SIZE:
             raise ValueError("Allowed results per page must be between 1 and 50")
 
         start_index = 0
