@@ -1086,6 +1086,34 @@ class JamaClient:
         params = {}
         testgroups = self.__get_all(resource_path, params=params, allowed_results_per_page=allowed_results_per_page)
         return testgroups
+    
+    def post_testgroup(self, testplan_id, testgroup_name, assigned_user_id=None):
+        """
+        This method will add a new testgroup to the test plan.
+        :param testplan_id (int) The integer testplan ID.
+        :param testgroup_name (str) The string test group name.
+        :param assigned_user_id (int) The ID of the assigned user
+        :return new testgroup id
+        """
+
+        resource_path = f'testplans/{testplan_id}/testgroups'
+        headers = {'content-type': 'application/json'}
+
+        body = {
+            'name': testgroup_name,
+            'assignedTo': assigned_user_id if assigned_user_id is not None else 0,
+        }
+
+        # Make the API Call
+        try:
+            response = self.__core.post(resource_path, data=json.dumps(body), headers=headers)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+
+        # Validate response
+        JamaClient.__handle_response_status(response)
+        return response.json()['meta']['id']
 
     def get_testgroup_testcases(self,testplan_id, testgroup_id, allowed_results_per_page=__allowed_results_per_page):
         """ This method will return all testcases in the give testgroup.
