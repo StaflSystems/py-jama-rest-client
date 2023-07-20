@@ -968,6 +968,45 @@ class JamaClient:
             raise APIException(str(err))
         JamaClient.__handle_response_status(response)
         return response.status_code
+    
+    def delete_test_case_from_test_group(self, testplan_id, testgroup_id, testcase_id):
+        """
+        Remove an existing test case from the test group.
+
+        :param testplan_id (int) The integer test plan ID.
+        :param testgroup_id (int) The integer test group ID.
+        :param testcase_id (int) The integer test case ID.
+
+        :return The success status code
+        """
+
+        resource_path = f'testplans/{testplan_id}/testgroups/{testgroup_id}/testcases/{testcase_id}'
+        try:
+            response = self.__core.delete(resource_path)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+        JamaClient.__handle_response_status(response)
+        return response.status_code
+    
+    def delete_test_group(self, testplan_id, testgroup_id):
+        """
+        Delete the specified test group.
+
+        :param testplan_id (int) The integer test plan ID.
+        :param testgroup_id (int) The integer test group ID.
+
+        :return The success status code
+        """
+
+        resource_path = f'testplans/{testplan_id}/testgroups/{testgroup_id}'
+        try:
+            response = self.__core.delete(resource_path)
+        except CoreException as err:
+            py_jama_rest_client_logger.error(err)
+            raise APIException(str(err))
+        JamaClient.__handle_response_status(response)
+        return response.status_code
 
     def patch_item(self, item_id, patches):
         """
