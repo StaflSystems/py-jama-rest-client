@@ -1,6 +1,5 @@
 import json
 import logging
-from tkinter.tix import MAX
 
 from .core import Core, CoreException
 
