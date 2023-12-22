@@ -1139,8 +1139,10 @@ class JamaClient:
 
         body = {
             'name': testgroup_name,
-            'assignedTo': assigned_user_id if assigned_user_id is not None else 0,
         }
+
+        if assigned_user_id is not None:
+            body['assignedTo'] = assigned_user_id
 
         # Make the API Call
         try:
