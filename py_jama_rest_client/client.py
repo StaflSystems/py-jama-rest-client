@@ -1181,7 +1181,7 @@ class JamaClient:
 
         resource_path = f'testplans/{testplan_id}/testgroups/{testgroup_id}/testcases'
         body = {
-            'testcase': testcase_id
+            'testCase': testcase_id
         }
         headers = {'content-type': 'application/json'}
 
